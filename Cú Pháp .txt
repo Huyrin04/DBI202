@@ -1,0 +1,175 @@
+- 1-1: man(mid là key)-->MARRY(year)<--woman(wid là key) thì ta có MARRY(mid, wid, year) và mid,year là foreign key reference và chọn 1 mid hoặc wid làm khóa chính
+- 1-n: prof(pid là key)<--TEACH--class(cid là key) thì class nhận key của prof làm khóa ngoại
+- n-n: hình thoi ở giữa nhận khóa của 2 cái n-n làm cả khóa chính và khóa ngoại
+- thực thể yếu(bị đóng 2 ngoặc): nó sẽ nhận thêm khóa chính của thực thể mạnh làm cả khóa chính và khóa ngoại
+- subclass(tam giác - isa): nhận tất cả khóa chính của cha làm khóa chính
+- quan hệ tự thân: VD: table employee có:
+	empID int primary key
+	ename varchar(20)
+	children varchar(20) -- đa trị (có 2 vòng tròn)
+	và tự móc về nó qua hình thoi tên manage
+thì ta có 2 bảng:
+create table emplyee(
+	empID int primary key
+	ename varchar(20)
+	manage int foreign key references employee(empID)
+)
+create table children(
+	children varchar(20)
+	empID int foreign key references employee(empID)
+	primary key(empID, childrenID)
+)
+
+(*) xem code đã viết:  sp_helptext + tên bảng 
+
+(*) 
+- field + Primary key: khóa chính
+C2: primary key (field)
+    CONSTRAINT ten_rang_buoc PRIMARY KEY (cot1, cot2, … cot_n)
+- field + foreign key references + name_table(field) : khóa ngoài (dùng gọi khóa chính ra)
+C2: constraint PK foreign key (field) references name_table(field)
+
+- Mỗi field chỉ được dùng 1 khóa, nếu muốn nhiều field trong 1 table có khóa chính dùng:
+    constraint PK primary key (field1, field2, ...)
+
+-Trong case table đã đc tạo, thêm key bằng cách:
+    alter table + name_table + add primary key (field)
+
+-xóa primary key: alter table + name_table + drop primary key
+
+1.Tạo:
+- create database <tên DATABASE>
+use <tên DATABASE>
+- create <tên TABLE>
+
+2. Xóa database, table: 
++) DROP DATADASE <tên DATABASE>
+
+[USE <tên DATABASE>]
++) DROP TABLE <tên TABLE>;
+
+3. Đổi tên database:
+ALTER DATABASE <tên DATABASE>
+Modify Name =  <tên DATABASE mới>
+
+   Đổi tên table:
+exec sp_rename 'name_table', 'new_name';	
+
+4. Sửa lại tên:
+Muốn đổi về chọn sang Master
+ALTER DATABASE QLTV_CuPhap
+Modify Name =  QLTV
+
+5. UNIQUE:
+Ràng buộc UNIQUE sẽ yêu cầu tất cả các giá trị trong một cột phải khác nhau.
+Bạn có thể có nhiều ràng buộc UNIQUE trong mỗi bảng nhưng chỉ có một ràng buộc PRIMARY KEY trong mỗi bảng.
+
+6. IDENTITY(không được phép nhập và nó sẽ tự động gán):
+CREATE TABLE Students(
+IDStudent int IDENTITY(1,1),      //(start, step)
+Name nvarchar(30)
+)
+
+7. INSERT(thêm dữ liệu cho bảng): 
+insert into <tên table> (cot1, cot2, cot3,...cotN)
+values (x1, y1, z1,...wn), 
+       (x2, y2, z2,...wm)...
+
+8. UPDATE(Sửa đổi dữ liệu bảng)
+update <tên table>
+set cot1 = giatri1, cot2 = giatri2...., cotN = giatriN
+WHERE [dieu_kien] and đk2, đk3...
+
+9. DELETE(xóa dữ liệu trong bảng)
+delete <tên table>
+from table1 from table2 ...
+where [dieu_kien] and đk2, đk3...
+
+10. AS
+“AS” trong SQL được sử dụng để cung cấp cho một bảng hoặc một cột trong bảng một cái tên tạm thời
+
+11. SELECT
+SELECT [ ALL | DISTINCT ]
+[ TOP (gia_tri_dau) [ PERCENT ] [ WITH TIES ] ]
+“Biểu thức”
+FROM “bảng”
+[WHERE “điều kiện”]
+[GROUP BY “biểu thức”]
+[HAVING “điều kiện”]
+[ORDER BY “biểu thức” [ ASC | DESC ]];
+
+- ALL: Trả lại tất cả các hàng phù hợp.
+- DISTINCT: Loại bỏ tất cả các giá trị trùng lặp khỏi bộ kết quả.
+- GROUP BY: Thu thập dữ liệu từ nhiều bản ghi và nhóm kết quả theo một hoặc nhiều cột ( vd: mỗi customer mua nhiều sp, dùng group by customer thì ta các customer trùng nhau sẽ đc gộp thành 1, và cột bên là tổng số sp mà customer đấy đã mua)
+- HAVING “điều kiện”: Dùng sau GROUP BY để lọc kết quả của group by (còn where là lọc toàn bộ)
+- ORDER BY “biểu thức”: Được dùng để lọc bộ kết quả. ASC sẽ lọc theo thứ tự tăng dần và DESC sẽ lọc theo thứ tự giảm dần.
+
+- WHERE:
++) Join
++) >,<.=,...
++) and, or, not, in
++) Between, like + %,_ , [a.b]% ... : % đại diện cho cụm kí tự bất kì, _ đại diện cho 1 kí tự, [a,b]% đại diện cho bắt đầu a or b
+vd: Diem>=5
+-HAVING: 
++)Max(), Min(), count(*), count(table.column), Sum(), AVG(),...
+vd: AVG(Diem1,Diem2,Diem3)>=5
+
+
+12. JOIN 
+SELECT cot1, cot2,... cotn
+FROM bang1 a inner join bang2 b
+ON a.cot_chung = b.cot_chung;
+
+- inner join: Trả về các bản ghi có những giá trị phù hợp trong cả hai bảng.
+- left outer join: Trả về tất cả bản ghi từ bảng bên trái và bản ghi trùng với bảng bên phải.
+- right (outer) join: Trả về tất cả bản ghi từ bảng bên phải và bản ghi trùng với bản bên trái.
+- full outer join: Trả về tất cả bản ghi khi có một kết quả phù hợp trong bảng bên trái hoặc bên phải.
+
+13. Self join
+SELECT a.ten_cot, b.ten_cot...
+FROM bang1 a, bang1 b
+WHERE a.cot_chung = b.cot_chung;
+
+SELF JOIN trong SQL được sử dụng để thực hiện phép Join trên cùng một bảng bằng cách nối một bảng với chính nó, coi như đó là hai bảng và thay tên tạm thời ít nhất một bảng.
+
+14. Begin Transaction
+Nếu không lỗi (tức values hợp lệ) thì sẽ insert, lỗi sẽ kết thúc
+
+begin transaction sp
+insert into Student 
+values('16', 'Huy', 109)
+if(@@ERROR <> 0) rollback transaction sp
+commit transaction
+
+15. Trigger
+*) xem lại trigger: sp_helptrigger + tên bảng
+
+CREATE TRIGGER <tên trigger>
+ON { Tên_bảng } --hđ trên bảng nào 
+[ WITH ENCRYPTION] 
+{ FOR | AFTER | INSTEAD OF }  -- thời điểm hoạt động
+{ [INSERT], [UPDATE] , [DELETE] } --hđ đó là
+AS
+Begin
+SQL_Statements
+End
+
+16. Cast vs Convert dùng để ép kiểu
+SELECT CAST(14.85 AS int)
+SELECT CAST(14.85 AS float)
+SELECT CAST(15.6 AS varchar)
+
+17. union
+SELECT sanpham_id FROM sanpham
+UNION
+SELECT sanpham_id FROM hangtonkho;
+
+- nếu có sanpham_id nào xuất hiện ở cả bảng sanpham và hangtonkho, thì sẽ chỉ còn 1 sanpham_id xuất hiện trong bộ kết quả. Nếu không muốn loại bỏ bản ghi trùng, hãy dùng toán tử UNION ALL.
+
+18. isnull(cột,0) : đổi các giá trị null thành 0
+
+19.  select top 1 with ties 
+
+20. Ktra cột có thiếu dữ liệu không (absence of data?) : IS NULL
+
+21. delfaut + gtri : nếu ko insert gtri mới thì sẽ dùng mặc định cho all
